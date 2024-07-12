@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 class CommandRunner {
     String projectDir;
     TextEditingController logController;
-    Function logAppender;
+    Function logAppender; // set to the addToLog() function from the project tab
 
     // List of project folders
     List<String> serverpodFolders = [];
@@ -69,17 +69,28 @@ class CommandRunner {
     ///
     Future<void> _runCommand(String command, {String subFolder = ""}) async {
         try {
-            Process.start('cmd', ['/c', command]).then((process) => process.stdout.pipe(stdout));
+            final process = await Process.start(
+                'cmd',
+                ['/c', command],
+                workingDirectory: "$projectDir${Platform.pathSeparator}$subFolder",
+            );
 
-            final process = await Process.start('cmd', ['/c', command], workingDirectory: "$projectDir${Platform.pathSeparator}$subFolder");
             logAppender("Running:\n $projectDir${Platform.pathSeparator}$subFolder${Platform.pathSeparator}$command");
-            process.stdout.transform(utf8.decoder).listen((line) => logAppender(line)); // Log each line
-            await process.exitCode; // Wait for process to finish
+
+            // Log each line (transform(utf8.decoder))
+            process.stdout.listen((line) => logAppender(line));
+            process.stderr.listen((line) => logAppender(line));
+
+            // Wait for process to finish
+            await process.exitCode;
         } catch (e) {
             logAppender('Error executing command: $command\n$e');
         }
     }
 
+    ///
+    /// Cleans the library files in all project folders.
+    ///
     Future<void> flutterClean() async {
         for (final folder in serverpodFolders) {
             await _runCommand(flutterCleanCommand, subFolder: folder);

@@ -1,11 +1,11 @@
 {
-    "name": "serverpod_manager",
-    "short_name": "serverpod_manager",
+    "name": "serverpod_toolbox",
+    "short_name": "serverpod_toolbox",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Manages the serverpod/flutter activities",
+    "description": "A set of tools to manage a serverpod project",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

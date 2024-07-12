@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:filepicker_windows/filepicker_windows.dart';
+import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_toolbox/preferences.dart';
 import 'package:serverpod_toolbox/widgets/default_button.dart';
+import 'package:tint/tint.dart';
 
 import 'command_runner.dart';
 import 'en.dart';
@@ -20,46 +24,63 @@ class ProjectTab extends StatefulWidget {
 }
 
 class _ProjectTabState extends State<ProjectTab> {
-    static const double defaultControlSpacing = 10;
+    static const double defaultControlSpacing = 2;
     final TextEditingController _logController = TextEditingController();
     late CommandRunner _commandRunner;
-    //final _projectDirectory = DirectoryPicker()..title = 'Select a directory';
+    late final _projectDirectoryPicker; //= DirectoryPicker()..title = 'Select a directory';
     String _projectFolderPath = "";
     late Preferences preferences;
     final _scrollController = ScrollController();
     bool _isLoading = false;
 
+    setupDirectoryPicker() {
+        _projectDirectoryPicker = (Platform.isWindows) ? _getDirectoryPathWindows() : _getDirectoryPathLinux();
 
-    final _projectDirectory = (Platform.isWindows)
-        ?  _getDirectoryPathWindows()
-        :  _getDirectoryPathLinux();
-
-    if (_projectDirectory != null) {
-    // Use the selected directory path here
-    } else {
-    // Handle case where user cancels or there's an error
+        // if (_projectDirectoryPicker != null) {
+        // Use the selected directory path here
+        //  } else {
+        // Handle case where user cancels or there's an error
+        //  }
     }
-    Future<String?> _getDirectoryPathWindows() async {
-        final directory =  DirectoryPicker()..title = 'Select a directory';
+
+    Future<DirectoryPicker> _getDirectoryPathWindows() async {
+        final directory = DirectoryPicker()..title = 'Select a directory';
         return directory;
     }
 
-    Future<String?> _getDirectoryPathLinux()  {
-        final result =  OpenFilePicker();
-        return result.; // Assuming the result has a "path" property
+    Future<String?> _getDirectoryPathLinux() async {
+        final result = await FilesystemPicker.open(
+            context: context,
+            //rootDirectory: Directory("/"), // Optional: Set initial directory
+            fsType: FilesystemType.folder, // Specify directory selection
+        );
+
+        if (result != null) {
+            return result; // This is the selected directory path
+        } else {
+            // Handle case where user cancels or there's an error
+            return null;
+        }
     }
 
     @override
     void initState() {
         super.initState();
 
+        loadPreferences();
+    }
+
+    ///
+    /// Load the stored preferences
+    ///
+    void loadPreferences() {
         preferences = Preferences();
         preferences.loadProjectDir().then((value) {
                 setState(() {
-                        if (value==null) {
+                        if (value == null) {
                             _projectFolderPath = "";
                         } else {
-                            _projectFolderPath=value;
+                            _projectFolderPath = value;
                             _commandRunner = CommandRunner(_projectFolderPath, _logController, _addToLog);
                             _commandRunner.populateFolders();
                         }
@@ -69,42 +90,52 @@ class _ProjectTabState extends State<ProjectTab> {
 
     @override
     Widget build(BuildContext context) {
-         return Padding(
+        return Padding(
             padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
+            child:  SingleChildScrollView(
                 child: SizedBox(
-                    height: 1500.0, // size of the scrollable area
+                    height: 900.0, // size of the scrollable area
                     child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                            _buildProjectFolderSelector(),
-                            const SizedBox(height: defaultControlSpacing),
-                            _buildFlutterUpgradeButton(),
-                            ...buildDivider(),
-                            _buildUpgradeCLIButton(),
-                            ...buildDivider(),
-                            _buildServerpodGenerateButton(),
-                            ...buildDivider(),
-                            _buildServerpodCreateMigrationButton(),
-                            ...buildDivider(),
-                            _buildServerpodBuildRunnerButton(),
-                            ...buildDivider(),
-                            _buildCreateRepairMigrationButton(),
-                            ...buildDivider(),
-                            _buildFlutterCleanButton(),
-                            ...buildDivider(),
-                            _buildFlutterGetPubButton(),
-                            ...buildDivider(),
-                            _buildFixDartFormatterButton(),
-                            ...buildDivider(),
+                            SingleChildScrollView(
+                                child: SizedBox(
+                                    height: 600.0, // size of the scrollable area
+                                    child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                            _buildProjectFolderSelector(),
+                                            ...buildDivider(),
+                                            const SizedBox(height: defaultControlSpacing),
+                                            _buildFlutterUpgradeButton(),
+                                            ...buildDivider(),
+                                            _buildUpgradeCLIButton(),
+                                            ...buildDivider(),
+                                            _buildServerpodGenerateButton(),
+                                            ...buildDivider(),
+                                            _buildServerpodCreateMigrationButton(),
+                                            ...buildDivider(),
+                                            _buildServerpodBuildRunnerButton(),
+                                            ...buildDivider(),
+                                            _buildCreateRepairMigrationButton(),
+                                            ...buildDivider(),
+                                            _buildFlutterCleanButton(),
+                                            ...buildDivider(),
+                                            _buildFlutterGetPubButton(),
+                                            ...buildDivider(),
+                                            _buildFixDartFormatterButton(),
+                                            ...buildDivider(),
+                                        ],
+                                    ),
+                                ),
+                            ),
                             _buildLogOutputArea(),
                             const SizedBox(height: defaultControlSpacing),
                             buildClearLogButton(),
                         ],
                     ),
                 ),
-            ),
-        );
+            ));
     }
 
     ///
@@ -132,7 +163,7 @@ class _ProjectTabState extends State<ProjectTab> {
                     ),
                     DefaultButton(
                         onPressed: () {
-                            final result = _projectDirectory.getDirectory();
+                            final result = _projectDirectoryPicker.getDirectory();
                             if (result != null) {
                                 setState(() {
                                         _projectFolderPath = result.path;
@@ -245,7 +276,8 @@ class _ProjectTabState extends State<ProjectTab> {
     Widget _buildServerpodCreateMigrationButton() {
         return Row(children: [
                 const Expanded(
-                    child: SelectableText("Upgrade your db with the latest changes to the models. Make sure 'main.dart --apply-migrations' is run on the next restart."),
+                    child: SelectableText("Create an upgrade script for your db with the latest changes to the models."
+                        " Make sure 'main.dart --apply-migrations' is run on the next restart."),
                 ),
                 DefaultButton(
                     onPressed: () async {
@@ -273,12 +305,12 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Shows a warning on 'create-migration --force' 
+    /// Shows a warning on 'create-migration --force'
     ///
-    void showCreateMigrationForceWarning(BuildContext context)  {
+    void showCreateMigrationForceWarning(BuildContext context) {
         showDialog(
             context: context,
-            builder: (context) =>  AlertDialog(
+            builder: (context) => AlertDialog(
                 title: const Text('Warning'),
                 content: const Text(
                     "Using the --force command will drop and rebuild any tables that can't be migrated.",
@@ -296,8 +328,7 @@ class _ProjectTabState extends State<ProjectTab> {
                         child: const Text('Continue'),
                     ),
                 ],
-            )
-        );
+            ));
     }
 
     ///
@@ -316,11 +347,12 @@ class _ProjectTabState extends State<ProjectTab> {
                     },
                     text: CommandRunner.buildRunnerCommand,
                     isLoading: _isLoading,
-                ), SizedBox(width: 10),
+                ),
+                const SizedBox(width: 10),
                 DefaultButton(
                     onPressed: () async {
                         _isLoading = true;
-                        await _commandRunner.buildRunner( '--release');
+                        await _commandRunner.buildRunner('--release');
                         _isLoading = false;
                     },
                     text: '--release',
@@ -378,6 +410,8 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Build clean button
     ///
+    /// Cleans the library files in all project folders.
+    ///
     Row _buildFlutterCleanButton() {
         return Row(
             children: [
@@ -420,7 +454,7 @@ class _ProjectTabState extends State<ProjectTab> {
                         await _commandRunner.flutterGet();
                         _isLoading = false;
                     },
-                    text:  flutterGetTitle,
+                    text: flutterGetTitle,
                     isLoading: _isLoading,
                 ),
                 IconButton(
@@ -488,12 +522,6 @@ class _ProjectTabState extends State<ProjectTab> {
     Expanded _buildLogOutputArea() {
         return Expanded(
             child: NotificationListener<ScrollNotification>(
-                onNotification: (notification) {
-                    if (notification is ScrollEndNotification && notification.depth == 0) {
-                        _scrollToBottom();
-                    }
-                    return true;
-                },
                 child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -523,18 +551,30 @@ class _ProjectTabState extends State<ProjectTab> {
         );
     }
 
-    void _scrollToBottom() {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    }
-
     ///
     /// Add text to the log area
     ///
-    void _addToLog(String message) {
+    void _addToLog(var rawOutput) {
+        String message = "";
+
+        if (rawOutput is Uint8List) {
+            // The output line is UTF8
+            final String text = utf8.decode(rawOutput);
+            // remove the ansi escape colours (.strip() is an extension method from the Tint library)
+            message = text.strip();
+        } else if (rawOutput is String) {
+            message = rawOutput;
+        } else {
+            message = rawOutput.toString();
+        }
+
         setState(() {
-                _logController.text += '$message\n';
-            });
+            _logController.text += '$message\n';
+            // Scroll the text area to the bottom after updating the text
+             _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        });
     }
+
 
     ///
     /// Shows the info popup
