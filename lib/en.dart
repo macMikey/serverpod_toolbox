@@ -7,7 +7,7 @@ String fixDartFormatHtml="Installs the dart_format plugin for all projects";
 
 String flutterUpgradeHtml='Upgrades all the pubspec.yaml packages to the latest major versions';
 
-String upgradeCliTitle='upgrade serverpod_cli';
+String upgradeCliText='upgrade serverpod_cli';
 String upgradeCliHtml='Upgrades the serverpod command line interface';
 
 String flutterGetTitle='dart pub get';
@@ -69,9 +69,9 @@ String serverpodGenerateHtml = "<b>serverpod generate</b>"
 
 
 String serverpodCreateRepairMigrationTitle = "serverpod create-repair-migration";
-String serverpodCreateRepairMigrationHtml = "The repair migration system will create a repair migration that makes your live database "
-    "schema match the newly created migration. To enable the command to fetch your live database schema it requires a running server. "
+String serverpodCreateRepairMigrationHtml = "The repair migration system will create a repair migration that makes your database "
+    "schema match the newly created migration. To enable the command to fetch your database schema it requires a running server. "
     "Navigate to your project's server package directory and start the server, "
-    "then run the create-repair-migration command.";
+    "then run the create-repair-migration command.  This will also need to be applied to your live database, possibly by manually running the --apply-repair-migration, when deployed";
 
 String serverpodApplyRepairMigrationTitle = "--apply-repair-migration";
