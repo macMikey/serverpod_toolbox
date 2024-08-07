@@ -34,9 +34,10 @@ class CommandRunner {
     /// Populate the directories
     ///
     Future<void> populateFolders() async {
-        if (projectDir.endsWith(Platform.pathSeparator)) {
-            throw Exception("Project dir must not end with a slash");
-        }
+        // remove all path separators from the end of the project directory
+            while (projectDir.endsWith(Platform.pathSeparator)) {
+                projectDir = projectDir.substring(0, projectDir.length - 1);
+            }
         // get the project name
         final segments = projectDir.split(Platform.pathSeparator);
         String projectName = segments.last;

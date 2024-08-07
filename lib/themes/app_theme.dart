@@ -31,16 +31,20 @@ class AppTheme {
     ///
     /// Create an AppTheme instance for the specified theme option
     ///
-    AppTheme(String themeOption) {
-        switch (themeOption) {
-            case 'light':
+    AppTheme(BuildContext context, ThemeMode themeMode) {
+        switch (themeMode) {
+            case ThemeMode.light:
                 _lightTheme();
                 break;
-            case 'dark':
+            case ThemeMode.dark:
                 _darkTheme();
                 break;
+            case ThemeMode.system:
+                 MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? _darkTheme() : _lightTheme();
+                 break;
             default:
-                throw ArgumentError('Invalid theme option: $themeOption');
+                throw ArgumentError('Invalid theme option: $themeMode');
         }
     }
 
@@ -140,3 +144,4 @@ class AppTheme {
         );
     }
 }
+

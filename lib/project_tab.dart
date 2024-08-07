@@ -109,9 +109,15 @@ class _ProjectTabState extends State<ProjectTab> {
                                                 ),
                                             ),
                                         ),
-                                        _buildLogOutputArea(),
-                                        const SizedBox(height: defaultControlSpacing),
                                         buildClearLogButton(),
+                                        const SizedBox(height: defaultControlSpacing),
+                                        _buildLogOutputArea(),
+                                        _isLoading
+                                        ? const SizedBox(width: 0)
+                                        : IconButton(
+                                            icon: Icon(Icons.open_in_new),
+                                            onPressed: _showLogDialog,
+                                        ),
                                     ],
                                 ),
                             ),
@@ -195,7 +201,7 @@ class _ProjectTabState extends State<ProjectTab> {
     CommandRow _buildServerpodGenerateButton() {
         return CommandRow(
             context: context,
-            label: "Generate model (model db classes) and end point code.",
+            label: "Generate model (model db classes) and end point code.  Note: Run create upgrade below for DB changes",
             commandText: serverpodGenerateTitle,
             onPlayPressed: () async {
                 _setLoading(true);
@@ -396,7 +402,7 @@ class _ProjectTabState extends State<ProjectTab> {
                     ),
                     child: ConstrainedBox(
                         constraints: const BoxConstraints(
-                            maxHeight: 500.0, // Adjust maxHeight for desired size
+                            maxHeight: 500.0,
                         ),
                         child: ListView(
                             controller: _scrollController, // Create a ScrollController
@@ -415,6 +421,59 @@ class _ProjectTabState extends State<ProjectTab> {
                     ),
                 ),
             ),
+        );
+    }
+
+    void _showLogDialog() {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+                return Dialog(
+                    child: SizedBox(
+                        width: 1000.0,
+                        height: 1400.0,
+                        child: Column(
+                            children: [
+                                AppBar(
+                                    title: Text('Log Output'),
+                                    actions: [
+                                        IconButton(
+                                            icon: Icon(Icons.close),
+                                            onPressed: () {
+                                                Navigator.of(context).pop();
+                                            },
+                                        ),
+                                    ],
+                                ),
+                                Expanded(
+                                    child: NotificationListener<ScrollNotification>(
+                                        child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                                border: Border.all(color: Colors.grey),
+                                            ),
+                                            child: ListView(
+                                                controller: _scrollController,
+                                                children: [
+                                                    TextField(
+                                                        controller: _logController,
+                                                        readOnly: true,
+                                                        maxLines: null,
+                                                        decoration: const InputDecoration(
+                                                            border: InputBorder.none,
+                                                            labelText: 'Log Output',
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                );
+            },
         );
     }
 
@@ -516,5 +575,4 @@ class _ProjectTabState extends State<ProjectTab> {
             return null;
         }
     }
-
 }
