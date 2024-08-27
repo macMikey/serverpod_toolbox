@@ -61,7 +61,7 @@ class ServerPodToolboxState extends State<ServerPodToolbox> {
             mainAxisSize: MainAxisSize.min, // Adjust the width of the Row
             children: [
                 const Text(
-                    'Theme',
+                    'Dark',
                     style: TextStyle(
                         color: Colors.blue,
                         fontSize: 16.0,

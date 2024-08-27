@@ -39,6 +39,14 @@ Your project should contain the standard serverpod folder structure:
 
 Where 'project_name' is the name of your serverpod project
 
+## Requirements
+Split the commands into Dart/Flutter, Serverpod, and Other groups
+Make the log output area larger
+Always show the scrollbar in the log output area
+Add checkbox - 'Clear the log on each new run?'
+Highlight errors
+
+
 
 ## Contributing
 

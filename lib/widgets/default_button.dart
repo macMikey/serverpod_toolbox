@@ -24,8 +24,8 @@ class DefaultButton extends StatelessWidget {
             onPressed: isLoading ? null : onPressed, // Disable button when loading
             style: isLoading
                 ? AppTheme.standardButtonStyle().copyWith(
-                backgroundColor: MaterialStateProperty.all(Colors.grey), // Grey out background
-                foregroundColor: MaterialStateProperty.all(Colors.white54) // Optional: Lighten text color
+                backgroundColor: WidgetStateProperty.all(Colors.grey), // Grey out background
+                foregroundColor: WidgetStateProperty.all(Colors.white54) // Optional: Lighten text color
             )
                 : AppTheme.standardButtonStyle(),
             child: Text(text), // Always show the text

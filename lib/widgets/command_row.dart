@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:serverpod_toolbox/info_box.dart';
 
+import 'copy_to_clipboard_button.dart';
+
 ///
 /// A generic 'Command Row' widget
 ///
@@ -45,9 +47,11 @@ class CommandRow extends StatelessWidget {
                     children: [
                         _buildLabel(),
                         const Spacer(),
-                        _buildCommandTextBox(commandText),
-                        const SizedBox(width: 10.0),
                         _buildPlayButton(onPlayPressed),
+                        const SizedBox(width: 5.0),
+                        _buildCommandTextBox(commandText, onPlayPressed),
+                        const SizedBox(width: 10.0),
+                        CopyToClipboardButton(textToCopy: commandText),
                         _buildInfoIcon(),
                     ],
                 ),
@@ -56,9 +60,11 @@ class CommandRow extends StatelessWidget {
                         children: [
                             const Spacer(),
                             const SizedBox(width: 10.0),
-                            _buildCommandTextBox(secondaryCommandText!),
-                            const SizedBox(width: 10.0),
                             _buildPlayButton(onSecondaryPlayPressed),
+                            const SizedBox(width: 5.0),
+                            _buildCommandTextBox(secondaryCommandText!, onPlayPressed),
+                            const SizedBox(width: 10.0),
+                            CopyToClipboardButton(textToCopy: commandText),
                             const SizedBox(width: 40.0),
                         ],
                     ),
@@ -81,17 +87,28 @@ class CommandRow extends StatelessWidget {
     }
 
     ///
-    /// Build the command text box widget.
+    /// Build the command text box/button widget.
     ///
     /// This widget displays the command text inside a styled container with a black background
-    /// and white terminal font.
+    /// and white terminal font.  Clicking the box will run the command.
     ///
-    Widget _buildCommandTextBox(String commandText) {
-        return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(4.0),
+    Widget _buildCommandTextBox(String commandText, Future<void> Function()? onPressed) {
+        return Tooltip(
+            message: 'Click to run this command in the project',
+            waitDuration: const Duration(seconds: 1),
+        child:TextButton(
+            onPressed: isLoading
+            ? null
+            : () async {
+                // Trigger the play action
+                await onPressed!();
+            },
+            style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4.0),
+                ),
             ),
             child: Theme(
                 data: ThemeData(
@@ -100,15 +117,15 @@ class CommandRow extends StatelessWidget {
                         selectionColor: Colors.blue,
                         selectionHandleColor: Colors.blue,
                     )),
-                child: SelectableText(
+                child: Text(
                     commandText,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Fira Mono', // Or a similar terminal font
+                    style: TextStyle(
+                        color: isLoading ? Colors.grey : Colors.white,
+                        fontFamily: 'Fira Mono',
                     ),
                 ),
             ),
-        );
+        ),);
     }
 
     ///
@@ -118,16 +135,21 @@ class CommandRow extends StatelessWidget {
     /// function and prevents multiple presses if [isLoading] is true.
     ///
     Widget _buildPlayButton(Future<void> Function()? onPressed) {
-        return IconButton(
-            icon: Icon(Icons.play_arrow, color: isLoading ? Colors.grey : Colors.green),
-            onPressed: isLoading
-            ? null
-            : () async {
-                // Trigger the play action
-                await onPressed!();
-            },
+        return Tooltip(
+            message: 'Click to run this command in the project',
+            waitDuration: const Duration(seconds: 1), // Add this for the delay
+            child: IconButton(
+                icon: Icon(Icons.play_arrow, color: isLoading ? Colors.grey : Colors.green),
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                    // Trigger the play action
+                    await onPressed!();
+                },
+            ),
         );
     }
+
 
     ///
     /// Build the info icon widget.

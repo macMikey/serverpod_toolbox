@@ -87,23 +87,23 @@ class _ProjectTabState extends State<ProjectTab> {
                                                         _buildProjectFolderSelector(),
                                                         ...buildDivider(),
                                                         const SizedBox(height: defaultControlSpacing),
-                                                        _buildFlutterUpgradeButton(),
+                                                        _buildFlutterUpgradeRow(),
                                                         ...buildDivider(),
-                                                        _buildUpgradeCLIButton(),
+                                                        _buildUpgradeCLIRow(),
                                                         ...buildDivider(),
-                                                        _buildServerpodGenerateButton(),
+                                                        _buildServerpodGenerateRow(),
                                                         ...buildDivider(),
-                                                        _buildServerpodCreateMigrationButton(),
+                                                        _buildServerpodCreateMigrationRow(),
                                                         ...buildDivider(),
-                                                        _buildServerpodBuildRunnerButton(),
+                                                        _buildServerpodBuildRunnerRow(),
                                                         ...buildDivider(),
-                                                        _buildCreateRepairMigrationButton(),
+                                                        _buildCreateRepairMigrationRow(),
                                                         ...buildDivider(),
-                                                        _buildFlutterCleanButton(),
+                                                        _buildFlutterCleanRow(),
                                                         ...buildDivider(),
-                                                        _buildFlutterGetPubButton(),
+                                                        _buildFlutterGetPubRow(),
                                                         ...buildDivider(),
-                                                        _buildFixDartFormatterButton(),
+                                                        _buildFixDartFormatterRow(),
                                                         ...buildDivider(),
                                                     ],
                                                 ),
@@ -170,7 +170,7 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Build the flutter upgrade button
     ///
-    CommandRow _buildFlutterUpgradeButton() {
+    CommandRow _buildFlutterUpgradeRow() {
         return CommandRow(
             context: context,
             label: "Upgrade flutter version, you can use --force if there are major changes.",
@@ -182,12 +182,12 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the 'upgrade CLI version' button
+    /// Build the 'upgrade CLI version' row
     ///
-    CommandRow _buildUpgradeCLIButton() {
+    CommandRow _buildUpgradeCLIRow() {
         return CommandRow(
             context: context,
-            label: "Upgrade flutter CLI version, required if upgrading flutter.   ",
+            label: "Upgrade serverpod CLI version, required if upgrading flutter.   ",
             commandText: upgradeCliText,
             onPlayPressed: _commandRunner.runUpgradeCLI,
             infoHtmlBody: upgradeCliHtml,
@@ -196,12 +196,12 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build serverpod generate button
+    /// Build the 'serverpod generate' row
     ///
-    CommandRow _buildServerpodGenerateButton() {
+    CommandRow _buildServerpodGenerateRow() {
         return CommandRow(
             context: context,
-            label: "Generate model (model db classes) and end point code.  Note: Run create upgrade below for DB changes",
+            label: "Generate model (model db classes) and end point code.  Note: Run 'create upgrade script' for any DB changes (below)",
             commandText: serverpodGenerateTitle,
             onPlayPressed: () async {
                 _setLoading(true);
@@ -214,9 +214,9 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the create migration button, with a secondary --force create migration button
+    /// Build the 'create migration' row, with a secondary --force create migration button
     ///
-    CommandRow _buildServerpodCreateMigrationButton() {
+    CommandRow _buildServerpodCreateMigrationRow() {
         return CommandRow(
             context: context,
             label: "Create an upgrade script for your db with the latest changes to the models.\n"
@@ -268,7 +268,7 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Build the 'dart run build_runner build --release' button
     ///
-    CommandRow _buildServerpodBuildRunnerButton() {
+    CommandRow _buildServerpodBuildRunnerRow() {
         return CommandRow(
             context: context,
             label: "Build server deployment, it will also update generated mock tests",
@@ -292,11 +292,11 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Build the repair migration row
     ///
-    CommandRow _buildCreateRepairMigrationButton() {
+    CommandRow _buildCreateRepairMigrationRow() {
         return CommandRow(
             context: context,
             label:
-            "Create a repair script of the db schema using the model yaml.\nThis will need to applied on the next server run, or by using the --apply-repair-migration here",
+            "Create a repair script of the db schema using the model yaml.\nThis will need to be applied on the next server run, or by using the --apply-repair-migration here",
             commandText: serverpodCreateRepairMigrationTitle,
             onPlayPressed: () async {
                 _isLoading = true;
@@ -319,7 +319,7 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Cleans the library files in all project folders.
     ///
-    CommandRow _buildFlutterCleanButton() {
+    CommandRow _buildFlutterCleanRow() {
         return CommandRow(
             context: context,
             label: "Cleans the library files in all project folders.",
@@ -337,7 +337,7 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Build  flutter get pub
     ///
-    CommandRow _buildFlutterGetPubButton() {
+    CommandRow _buildFlutterGetPubRow() {
         return CommandRow(
             context: context,
             label: "Get the latest/upgraded libraries across all 4 project folders.",
@@ -355,7 +355,7 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Fix the dart_format plugin for intellij
     ///
-    CommandRow _buildFixDartFormatterButton() {
+    CommandRow _buildFixDartFormatterRow() {
         return CommandRow(
             context: context,
             label: "Fix dart_format plugin for IntelliJ.",
