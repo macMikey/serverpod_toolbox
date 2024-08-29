@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_toolbox/controllers/project_tab_controller.dart';
 import 'package:serverpod_toolbox/widgets/command_row.dart';
 import 'package:serverpod_toolbox/widgets/default_button.dart';
-import 'package:serverpod_toolbox/widgets/resizable_log_area.dart';
 
 import '../controllers/command_runner.dart';
 import '../en.dart';

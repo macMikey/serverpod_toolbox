@@ -25,10 +25,10 @@ Your project should contain the standard serverpod folder structure:
 Where 'project_name' is the name of your serverpod project
 
 ## Next Version
-Larger log output area 
-Always show the scrollbar in the log output area
-Add checkbox - 'Clear the log on each new run?'
-Popup errors when running commands that fail
+- Larger log output area 
+- Always show the scrollbar in the log output area
+- Add checkbox - 'Clear the log on each new run?'
+- Popup errors when running commands that fail
 
 ## Contributing
 
