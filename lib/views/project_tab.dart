@@ -385,13 +385,6 @@ class _ProjectTabState extends State<ProjectTab> {
         );
     }
 
-    Widget _buildLogOutputAreaNew() {
-        return SizedBox(
-            height: 200,
-            child: ResizableLogOutput(logController: logController),
-        );
-    }
-
     ///
     /// Build the log output area
     ///
