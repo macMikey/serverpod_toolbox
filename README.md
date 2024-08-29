@@ -10,8 +10,6 @@ and providing easy access to essential commands.  Simplify the process of buildi
 - **Upgrade Assistance:** Provides a safe upgrade process and warns of potential issues.
 - **Risk Warnings:** Stay informed with alerts about potentially risky commands to keep your project safe.
 
-**Getting Started:**
-
 ## Installation and Setup
 
 1. **Install the application:** 
@@ -26,14 +24,11 @@ Your project should contain the standard serverpod folder structure:
 
 Where 'project_name' is the name of your serverpod project
 
-## Requirements
-Split the commands into Dart/Flutter, Serverpod, and Other groups
-Make the log output area larger
+## Next Version
+Larger log output area 
 Always show the scrollbar in the log output area
 Add checkbox - 'Clear the log on each new run?'
 Popup errors when running commands that fail
-
-
 
 ## Contributing
 
