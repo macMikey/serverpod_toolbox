@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:serverpod_toolbox/project_tab.dart';
+import 'package:serverpod_toolbox/views/project_tab.dart';
 import 'package:serverpod_toolbox/themes/app_theme.dart';
-import 'package:serverpod_toolbox/user_admin_tab.dart';
+import 'package:serverpod_toolbox/views/user_admin_tab.dart';
 
 ///
 /// A toolbox for common commands used when developing a serverpod project
@@ -61,7 +61,7 @@ class ServerPodToolboxState extends State<ServerPodToolbox> {
             mainAxisSize: MainAxisSize.min, // Adjust the width of the Row
             children: [
                 const Text(
-                    'Dark',
+                    'Dark Mode',
                     style: TextStyle(
                         color: Colors.blue,
                         fontSize: 16.0,

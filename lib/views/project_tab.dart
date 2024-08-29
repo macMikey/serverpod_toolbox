@@ -1,18 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
-import 'package:filepicker_windows/filepicker_windows.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:serverpod_toolbox/preferences.dart';
+import 'package:serverpod_toolbox/controllers/project_tab_controller.dart';
 import 'package:serverpod_toolbox/widgets/command_row.dart';
 import 'package:serverpod_toolbox/widgets/default_button.dart';
-import 'package:tint/tint.dart';
+import 'package:serverpod_toolbox/widgets/resizable_log_area.dart';
 
-import 'command_runner.dart';
-import 'en.dart';
+import '../controllers/command_runner.dart';
+import '../en.dart';
 
 ///
 /// The project management tab
@@ -26,10 +21,9 @@ class ProjectTab extends StatefulWidget {
 
 class _ProjectTabState extends State<ProjectTab> {
     static const double defaultControlSpacing = 2;
-    final TextEditingController _logController = TextEditingController();
-    late CommandRunner _commandRunner;
-    String _projectFolderPath = "";
-    late Preferences preferences;
+
+    late ProjectTabController _controller;
+    final TextEditingController logController = TextEditingController();
     final _scrollController = ScrollController();
     bool _isLoading = false;
     late Future<void> _loadPreferencesFuture;
@@ -37,24 +31,9 @@ class _ProjectTabState extends State<ProjectTab> {
     @override
     void initState() {
         super.initState();
-        _loadPreferencesFuture = loadPreferences();
-    }
-
-    ///
-    /// Load the stored preferences
-    ///
-    Future<void> loadPreferences() async {
-        preferences = Preferences();
-        String? value = await preferences.loadProjectDir();
-        setState(() {
-                if (value == null) {
-                    _projectFolderPath = "";
-                } else {
-                    _projectFolderPath = value;
-                    _commandRunner = CommandRunner(_projectFolderPath, _logController, _addToLog);
-                    _commandRunner.populateFolders();
-                }
-            });
+        _controller = ProjectTabController(logController);
+        _loadPreferencesFuture = _controller.loadPreferences();
+        setState(() {});
     }
 
     @override
@@ -63,65 +42,82 @@ class _ProjectTabState extends State<ProjectTab> {
             future: _loadPreferencesFuture,
             builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                    // While waiting for the future to complete, show a loading indicator
+                    // Show a loading indicator while waiting for the future to complete
                     return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                    // Handle errors if any
+                    // Handle errors
                     return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                    // Future completed successfully, build your form here
+                    // Future completed successfully, build form
                     return Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: SingleChildScrollView(
-                            child: SizedBox(
-                                height: 900.0, // size of the scrollable area
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                        SingleChildScrollView(
-                                            child: SizedBox(
-                                                height: 720.0, // size of the scrollable area
-                                                child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                        _buildProjectFolderSelector(),
-                                                        ...buildDivider(),
-                                                        const SizedBox(height: defaultControlSpacing),
-                                                        _buildFlutterUpgradeRow(),
-                                                        ...buildDivider(),
-                                                        _buildUpgradeCLIRow(),
-                                                        ...buildDivider(),
-                                                        _buildServerpodGenerateRow(),
-                                                        ...buildDivider(),
-                                                        _buildServerpodCreateMigrationRow(),
-                                                        ...buildDivider(),
-                                                        _buildServerpodBuildRunnerRow(),
-                                                        ...buildDivider(),
-                                                        _buildCreateRepairMigrationRow(),
-                                                        ...buildDivider(),
-                                                        _buildFlutterCleanRow(),
-                                                        ...buildDivider(),
-                                                        _buildFlutterGetPubRow(),
-                                                        ...buildDivider(),
-                                                        _buildFixDartFormatterRow(),
-                                                        ...buildDivider(),
-                                                    ],
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                            children: [
+                                Expanded(
+                                    child: SingleChildScrollView(
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                                const SizedBox(height: 20),
+                                                _buildProjectFolderSelector(),
+                                                const SizedBox(height: 20),
+                                                Text("Run Serverpod Commands", style: Theme.of(context).textTheme.headlineSmall),
+                                                Container(
+                                                    margin: const EdgeInsets.symmetric(vertical: 4.0),
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(color: Colors.grey),
+                                                        borderRadius: BorderRadius.circular(8.0),
+                                                    ),
+                                                    child: Column(
+                                                        children: [
+                                                            _buildUpgradeCLIRow(),
+                                                            buildDivider(),
+                                                            _buildServerpodGenerateRow(),
+                                                            buildDivider(),
+                                                            _buildServerpodCreateMigrationRow(),
+                                                            buildDivider(),
+                                                            _buildServerpodBuildRunnerRow(),
+                                                            buildDivider(),
+                                                            _buildCreateRepairMigrationRow(),
+                                                        ],
+                                                    ),
                                                 ),
-                                            ),
+                                                Text("Run Flutter Commands", style: Theme.of(context).textTheme.headlineSmall),
+                                                Container(
+                                                    margin: const EdgeInsets.symmetric(vertical: 4.0),
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(color: Colors.grey),
+                                                        borderRadius: BorderRadius.circular(8.0),
+                                                    ),
+                                                    child: Column(
+                                                        children: [
+                                                            _buildFlutterUpgradeRow(),
+                                                            buildDivider(),
+                                                            _buildFlutterCleanRow(),
+                                                            buildDivider(),
+                                                            _buildFlutterGetPubRow(),
+                                                            buildDivider(),
+                                                            _buildFixDartFormatterRow(),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
                                         ),
-                                        buildClearLogButton(),
-                                        const SizedBox(height: defaultControlSpacing),
-                                        _buildLogOutputArea(),
-                                        _isLoading
-                                        ? const SizedBox(width: 0)
-                                        : IconButton(
-                                            icon: Icon(Icons.open_in_new),
-                                            onPressed: _showLogDialog,
-                                        ),
-                                    ],
+                                    ),
                                 ),
-                            ),
-                        ));
+                                _buildClearLogButton(),
+                                _buildLogOutputArea(),
+                                _isLoading
+                                ? const SizedBox(width: 0)
+                                : IconButton(
+                                    icon: const Icon(Icons.open_in_new),
+                                    onPressed: _showLogDialog,
+                                ),
+                            ],
+                        ),
+                    );
                 }
             });
     }
@@ -137,29 +133,20 @@ class _ProjectTabState extends State<ProjectTab> {
                     SizedBox(
                         width: totalWidth - 100,
                         child: TextField(
-                            controller: TextEditingController(text: _projectFolderPath), // Set initial text
+                            controller: TextEditingController(text: _controller.projectFolderPath), // Set initial text
                             decoration: const InputDecoration(
-                                labelText: 'Top Level Project folder',
+                                labelText: 'Select Top Level Project folder',
                                 border: OutlineInputBorder(),
                             ),
                             onChanged: (value) {
                                 // Update the state with the entered text
-                                _projectFolderPath = value;
-                                preferences.saveProjectDir(_projectFolderPath);
+                                _controller.updateProjectFolder(value);
                             },
                         ),
                     ),
                     const SizedBox(width: 10),
                     DefaultButton(
-                        onPressed: () async {
-                            final selectedDirectory = await _getDirectoryPicker();
-                            if (selectedDirectory != null) {
-                                setState(() {
-                                        _projectFolderPath = selectedDirectory;
-                                    });
-                                preferences.saveProjectDir(_projectFolderPath);
-                            }
-                        },
+                        onPressed: () => _controller.handleProjectFolderSelector(context, setState),
                         text: '...',
                         isLoading: _isLoading,
                     ),
@@ -175,7 +162,11 @@ class _ProjectTabState extends State<ProjectTab> {
             context: context,
             label: "Upgrade flutter version, you can use --force if there are major changes.",
             commandText: CommandRunner.flutterPubUpgrade,
-            onPlayPressed: _commandRunner.flutterUpgrade,
+            onPlayPressed: () async {
+                _setLoading(true);
+                _controller.commandRunner.flutterUpgrade();
+                _setLoading(false);
+            },
             infoHtmlBody: flutterUpgradeHtml,
             isLoading: _isLoading,
         );
@@ -189,7 +180,11 @@ class _ProjectTabState extends State<ProjectTab> {
             context: context,
             label: "Upgrade serverpod CLI version, required if upgrading flutter.   ",
             commandText: upgradeCliText,
-            onPlayPressed: _commandRunner.runUpgradeCLI,
+            onPlayPressed: () async {
+                _setLoading(true);
+                _controller.commandRunner.runUpgradeCLI();
+                _setLoading(false);
+            },
             infoHtmlBody: upgradeCliHtml,
             isLoading: _isLoading,
         );
@@ -205,7 +200,7 @@ class _ProjectTabState extends State<ProjectTab> {
             commandText: serverpodGenerateTitle,
             onPlayPressed: () async {
                 _setLoading(true);
-                await _commandRunner.serverPodGenerate();
+                await _controller.commandRunner.serverPodGenerate();
                 _setLoading(false);
             },
             infoHtmlBody: serverpodGenerateHtml,
@@ -223,17 +218,18 @@ class _ProjectTabState extends State<ProjectTab> {
             "Make sure 'main.dart --apply-migrations' is run on the next restart.",
             commandText: CommandRunner.serverpodCreateMigrationCommand,
             onPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.serverpodCreateMigration();
-                _isLoading = false;
+                _setLoading(true);
+
+                await _controller.commandRunner.serverpodCreateMigration();
+                _setLoading(false);
             },
             infoHtmlBody: createMigrationHtml,
             isLoading: _isLoading,
             secondaryCommandText: '${CommandRunner.serverpodCreateMigrationCommand} --force (WARNING)',
             onSecondaryPlayPressed: () async {
-                _isLoading = true;
+                _setLoading(true);
                 _showMigrationForceWarning(context);
-                _isLoading = false;
+                _setLoading(false);
             },
         );
     }
@@ -257,7 +253,7 @@ class _ProjectTabState extends State<ProjectTab> {
                     TextButton(
                         onPressed: () {
                             Navigator.pop(context);
-                            _commandRunner.serverpodCreateMigration('--force');
+                            _controller.commandRunner.serverpodCreateMigration('--force');
                         },
                         child: const Text('Continue'),
                     ),
@@ -274,17 +270,17 @@ class _ProjectTabState extends State<ProjectTab> {
             label: "Build server deployment, it will also update generated mock tests",
             commandText: CommandRunner.buildRunnerCommand,
             onPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.buildRunner();
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.buildRunner();
+                _setLoading(false);
             },
             infoHtmlBody: buildRunnerHtml,
             isLoading: _isLoading,
             secondaryCommandText: '${CommandRunner.buildRunnerCommand} --release',
             onSecondaryPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.buildRunner('--release');
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.buildRunner('--release');
+                _setLoading(false);
             },
         );
     }
@@ -299,17 +295,17 @@ class _ProjectTabState extends State<ProjectTab> {
             "Create a repair script of the db schema using the model yaml.\nThis will need to be applied on the next server run, or by using the --apply-repair-migration here",
             commandText: serverpodCreateRepairMigrationTitle,
             onPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.serverpodCreateRepairMigration();
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.serverpodCreateRepairMigration();
+                _setLoading(false);
             },
             infoHtmlBody: serverpodCreateRepairMigrationHtml,
             isLoading: _isLoading,
             secondaryCommandText: CommandRunner.serverpodApplyRepairMigrationCommand, //serverpodApplyRepairMigrationTitle,
             onSecondaryPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.serverpodApplyRepairMigration();
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.serverpodApplyRepairMigration();
+                _setLoading(false);
             },
         );
     }
@@ -325,9 +321,9 @@ class _ProjectTabState extends State<ProjectTab> {
             label: "Cleans the library files in all project folders.",
             commandText: flutterCleanTitle,
             onPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.flutterClean();
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.flutterClean();
+                _setLoading(false);
             },
             infoHtmlBody: flutterCleanHtml,
             isLoading: _isLoading,
@@ -335,7 +331,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build  flutter get pub
+    /// Build 'flutter get pub'
     ///
     CommandRow _buildFlutterGetPubRow() {
         return CommandRow(
@@ -343,9 +339,9 @@ class _ProjectTabState extends State<ProjectTab> {
             label: "Get the latest/upgraded libraries across all 4 project folders.",
             commandText: flutterGetTitle,
             onPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.flutterGet();
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.flutterGet();
+                _setLoading(false);
             },
             infoHtmlBody: flutterGetHtml,
             isLoading: _isLoading,
@@ -361,9 +357,9 @@ class _ProjectTabState extends State<ProjectTab> {
             label: "Fix dart_format plugin for IntelliJ.",
             commandText: CommandRunner.fixDartFormat,
             onPlayPressed: () async {
-                _isLoading = true;
-                await _commandRunner.runFixDartFormat();
-                _isLoading = false;
+                _setLoading(true);
+                await _controller.commandRunner.runFixDartFormat();
+                _setLoading(false);
             },
             infoHtmlBody: fixDartFormatHtml,
             isLoading: _isLoading,
@@ -373,13 +369,13 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Clear log button
     ///
-    Row buildClearLogButton() {
+    Row _buildClearLogButton() {
         return Row(
             children: [
                 DefaultButton(
                     onPressed: () {
                         setState(() {
-                                _logController.text = ''; // Clear the text controller
+                                logController.text = ''; // Clear the text controller
                             });
                     },
                     text: 'Clear log output',
@@ -389,11 +385,19 @@ class _ProjectTabState extends State<ProjectTab> {
         );
     }
 
+    Widget _buildLogOutputAreaNew() {
+        return SizedBox(
+            height: 200,
+            child: ResizableLogOutput(logController: logController),
+        );
+    }
+
     ///
     /// Build the log output area
     ///
-    Expanded _buildLogOutputArea() {
-        return Expanded(
+    Widget _buildLogOutputArea() {
+        return SizedBox(
+            height: 150,
             child: NotificationListener<ScrollNotification>(
                 child: Container(
                     padding: const EdgeInsets.all(10),
@@ -408,7 +412,7 @@ class _ProjectTabState extends State<ProjectTab> {
                             controller: _scrollController, // Create a ScrollController
                             children: [
                                 TextField(
-                                    controller: _logController,
+                                    controller: logController,
                                     readOnly: true,
                                     maxLines: null,
                                     decoration: const InputDecoration(
@@ -435,10 +439,10 @@ class _ProjectTabState extends State<ProjectTab> {
                         child: Column(
                             children: [
                                 AppBar(
-                                    title: Text('Log Output'),
+                                    title: const Text('Log Output'),
                                     actions: [
                                         IconButton(
-                                            icon: Icon(Icons.close),
+                                            icon: const Icon(Icons.close),
                                             onPressed: () {
                                                 Navigator.of(context).pop();
                                             },
@@ -456,7 +460,7 @@ class _ProjectTabState extends State<ProjectTab> {
                                                 controller: _scrollController,
                                                 children: [
                                                     TextField(
-                                                        controller: _logController,
+                                                        controller: logController,
                                                         readOnly: true,
                                                         maxLines: null,
                                                         decoration: const InputDecoration(
@@ -477,33 +481,9 @@ class _ProjectTabState extends State<ProjectTab> {
         );
     }
 
-    ///
-    /// Add text to the log area
-    ///
-    void _addToLog(var rawOutput) {
-        String message = "";
-
-        if (rawOutput is Uint8List) {
-            // The output line is UTF8
-            final String text = utf8.decode(rawOutput);
-            // remove the ansi escape colours (.strip() is an extension method from the Tint library)
-            message = text.strip();
-        } else if (rawOutput is String) {
-            message = rawOutput;
-        } else {
-            message = rawOutput.toString();
-        }
-
-        setState(() {
-                _logController.text += '$message\n';
-                // Scroll the text area to the bottom after updating the text
-                _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-            });
-    }
-
     @override
     void dispose() {
-        _logController.dispose();
+        logController.dispose();
         _scrollController.dispose();
         super.dispose();
     }
@@ -511,68 +491,22 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Divider and spacer
     ///
-    List<Widget> buildDivider() {
-        return [
-            const Divider(
-                // Add divider line here
-                thickness: 1, // Adjust thickness as needed
-                color: Colors.grey, // Adjust color as needed
-            ),
-            const SizedBox(height: defaultControlSpacing)
-        ];
+    Widget buildDivider() {
+        return const Column(
+            children: [
+                Divider(
+                    // Add divider line here
+                    thickness: 1, // Adjust thickness as needed
+                    color: Colors.grey, // Adjust color as needed
+                ),
+                SizedBox(height: defaultControlSpacing)
+            ],
+        );
     }
 
     void _setLoading(bool isLoading) {
         setState(() {
                 _isLoading = isLoading;
             });
-    }
-
-    ///
-    /// Directory picker selection
-    ///
-    Future<String?> _getDirectoryPicker() {
-        return (Platform.isWindows) ? _getDirectoryPathWindows() : _getDirectoryPathLinux();
-    }
-
-    ///
-    /// Directory picker selection for windows
-    ///
-    Future<String?> _getDirectoryPathWindows() {
-        final Completer<String?> completer = Completer<String?>();
-
-        // Use DirectoryPicker to open the directory picker dialog
-        final directoryPicker = DirectoryPicker()..title = 'Select a directory';
-
-        // Show the directory picker dialog
-        Future.microtask(() {
-                final selectedDirectory = directoryPicker.getDirectory();
-                if (selectedDirectory != null) {
-                    // Complete the Future with the selected directory path
-                    completer.complete(selectedDirectory.path);
-                } else {
-                    // Complete the Future with null if no directory was selected
-                    completer.complete(null);
-                }
-            });
-        return completer.future;
-    }
-
-    ///
-    /// Directory picker selection for Linux
-    ///
-    Future<String?> _getDirectoryPathLinux() async {
-        final result = await FilesystemPicker.open(
-            context: context,
-            //rootDirectory: Directory("/"), // Optional: Set initial directory
-            fsType: FilesystemType.folder, // Specify directory selection
-        );
-
-        if (result != null) {
-            return result; // This is the selected directory path
-        } else {
-            // Handle case where user cancels or there's an error
-            return null;
-        }
     }
 }

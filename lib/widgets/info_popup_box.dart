@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
+///
+/// Popup box for info text
+///
 class InfoPopupBox {
     final String title;
     final String htmlContent;
@@ -24,12 +27,6 @@ class InfoPopupBox {
                                     SingleChildScrollView(
                                         child: Html(
                                             data: htmlContent,
-                                            // Optional styling for the HTML content
-                                            // style: {
-                                            //     '*': Style(
-                                            //         fontSize: StyleAttribute(value: 16.0),
-                                            //     ),
-                                            // },
                                         ),
                                     ),
 
@@ -47,11 +44,5 @@ class InfoPopupBox {
         );
     }
 
-    Widget _buildHtmlContent() {
-        return Text(
-            htmlContent,
-            style: const TextStyle(fontSize: 16.0),
-        );
 
-    }
 }

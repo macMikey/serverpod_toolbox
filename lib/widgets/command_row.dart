@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:serverpod_toolbox/info_box.dart';
+import 'package:serverpod_toolbox/widgets/info_popup_box.dart';
 
 import 'copy_to_clipboard_button.dart';
 
@@ -82,7 +82,6 @@ class CommandRow extends StatelessWidget {
         return Text(
             label,
             maxLines: 2,
-            // overflow: TextOverflow.ellipsis,
         );
     }
 
@@ -108,6 +107,10 @@ class CommandRow extends StatelessWidget {
                 backgroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4.0),
+                    side: BorderSide(
+                        color: Colors.white,  // Set the color of the border
+                        width: 0.5,          // Set the width of the border
+                    ),
                 ),
             ),
             child: Theme(

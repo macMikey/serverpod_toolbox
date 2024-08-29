@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
-import 'package:serverpod_toolbox/command_runner.dart';
+import 'package:serverpod_toolbox/controllers/command_runner.dart';
 import 'package:test/test.dart';
 
 // import '../command_runner_test.mocks.dart';

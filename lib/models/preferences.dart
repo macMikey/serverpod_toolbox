@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// Stored preferences
 ///
-///
 class Preferences {
 
     Future<String?> loadProjectDir() async {

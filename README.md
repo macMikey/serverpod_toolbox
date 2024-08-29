@@ -1,27 +1,14 @@
 # Serverpod Toolbox
 
-This toolbox simplifies managing Serverpod projects by automating frequently used commands and providing safety checks. 
-Streamline your workflow for building, running, and upgrading your Serverpod project.
+The Serverpod Toolbox is designed to optimize your Serverpod development workflow by automating common tasks, ensuring safe upgrades, 
+and providing easy access to essential commands.  Simplify the process of building, running, and maintaining your Serverpod projects.
 
-## Pain Points of Serverpod Development
+## Key Features
 
-- **Repetitive Commands:** Tired of manually typing the same commands across multiple projects?
-- **Command Lookup:** Struggling to remember infrequently used commands?
-- **Safe Upgrades:** Worried about breaking your project during upgrades?
-
-The Serverpod Toolbox addresses these issues by:
-
-- **Automating Tasks:** Executes common commands with a single click.
-- **Command Reference:** Provides a readily accessible list of commands.
-- **Upgrade Assistance:** Projects a safe upgrade process and warns of potential issues.
-
-
-## Features
-
-- **Build & Run:** Effortlessly build and run your Serverpod project.
-- **Upgrade Guidance:** Assists with safe upgrades of Serverpod and Flutter.
-- **Command Reference:** Provides a convenient overview of available commands.
-- **Issue Warnings:** Alerts you to potentially risky commands.
+- **Automating Tasks:** Execute frequently used commands with a single click
+- **Command Library:** Access an organized list of commands.
+- **Upgrade Assistance:** Provides a safe upgrade process and warns of potential issues.
+- **Risk Warnings:** Stay informed with alerts about potentially risky commands to keep your project safe.
 
 **Getting Started:**
 
@@ -44,7 +31,7 @@ Split the commands into Dart/Flutter, Serverpod, and Other groups
 Make the log output area larger
 Always show the scrollbar in the log output area
 Add checkbox - 'Clear the log on each new run?'
-Highlight errors
+Popup errors when running commands that fail
 
 
 
