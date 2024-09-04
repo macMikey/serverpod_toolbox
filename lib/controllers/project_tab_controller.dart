@@ -115,6 +115,7 @@ class ProjectTabController {
         }
 
         logController.text += '$message\n';
+
     }
 
 

@@ -30,6 +30,11 @@ class _ProjectTabState extends State<ProjectTab> {
     @override
     void initState() {
         super.initState();
+
+        logController.addListener(() {
+            // Scroll to the bottom whenever new text is added
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        });
         _controller = ProjectTabController(logController);
         _loadPreferencesFuture = _controller.loadPreferences();
         setState(() {});
@@ -52,13 +57,13 @@ class _ProjectTabState extends State<ProjectTab> {
                         padding: const EdgeInsets.all(10.0),
                         child: Column(
                             children: [
+                                const SizedBox(height: 20),
+                                _buildProjectFolderSelector(),
                                 Expanded(
                                     child: SingleChildScrollView(
                                         child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
-                                                const SizedBox(height: 20),
-                                                _buildProjectFolderSelector(),
                                                 const SizedBox(height: 20),
                                                 Text("Run Serverpod Commands", style: Theme.of(context).textTheme.headlineSmall),
                                                 Container(
@@ -108,9 +113,7 @@ class _ProjectTabState extends State<ProjectTab> {
                                 ),
                                 _buildClearLogButton(),
                                 _buildLogOutputArea(),
-                                _isLoading
-                                ? const SizedBox(width: 0)
-                                : IconButton(
+                                IconButton(
                                     icon: const Icon(Icons.open_in_new),
                                     onPressed: _showLogDialog,
                                 ),
@@ -401,7 +404,7 @@ class _ProjectTabState extends State<ProjectTab> {
                             maxHeight: 500.0,
                         ),
                         child: ListView(
-                            controller: _scrollController, // Create a ScrollController
+                          //  controller: _scrollController,
                             children: [
                                 TextField(
                                     controller: logController,
@@ -420,6 +423,9 @@ class _ProjectTabState extends State<ProjectTab> {
         );
     }
 
+    ///
+    /// Shows the log area popup
+    ///
     void _showLogDialog() {
         showDialog(
             context: context,
@@ -497,6 +503,10 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     void _setLoading(bool isLoading) {
+        if (isLoading) {
+            logController.text = '';
+            _showLogDialog();
+        }
         setState(() {
                 _isLoading = isLoading;
             });

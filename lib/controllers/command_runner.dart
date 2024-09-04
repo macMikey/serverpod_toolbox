@@ -56,7 +56,7 @@ class CommandRunner {
         serverpodFolders = [_projectFolderServer, _projectFolderFlutter, _projectFolderClient];
 
         // Add the  'project_shared' folder if it exists
-        String sharedDir = "${projectName}_shared";
+        String sharedDir = "${projectDir}${Platform.pathSeparator}${projectName}_shared";
         bool sharedFolderExists = await Directory(sharedDir).exists();
         if (sharedFolderExists) {
             _projectFolderShared = "${projectName}_shared";
