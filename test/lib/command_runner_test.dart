@@ -9,13 +9,12 @@ void main() {
     late TextEditingController mockLogController;
 
     setUp(() async {
-
             mockDirectory = Directory('${Directory.current.path}\\test\\mock_project');
             mockLogController = TextEditingController();
         });
 
     test('should populate project folders correctly', () async {
-            final commandRunner = CommandRunner(mockDirectory.path, mockLogController, () {});
+            final commandRunner = CommandRunner(mockDirectory.path, ()=>{});
             await commandRunner.populateFolders();
             expect(commandRunner.serverpodFolders.length, 4); 
         });

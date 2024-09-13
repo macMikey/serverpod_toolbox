@@ -22,8 +22,10 @@ class _ProjectTabState extends State<ProjectTab> {
     static const double defaultControlSpacing = 2;
 
     late ProjectTabController _controller;
-    final TextEditingController logController = TextEditingController();
-    final _scrollController = ScrollController();
+    final TextEditingController _popupLogController = TextEditingController();
+    final _popupLogAreaScrollController = ScrollController();
+    final TextEditingController _integratedLogController = TextEditingController();
+    final _integratedLogAreaScrollController = ScrollController();
     bool _isLoading = false;
     late Future<void> _loadPreferencesFuture;
 
@@ -31,11 +33,15 @@ class _ProjectTabState extends State<ProjectTab> {
     void initState() {
         super.initState();
 
-        logController.addListener(() {
-            // Scroll to the bottom whenever new text is added
-            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-        });
-        _controller = ProjectTabController(logController);
+        _popupLogController.addListener(() {
+                // Scroll to the bottom whenever new text is added
+                _popupLogAreaScrollController.jumpTo(_popupLogAreaScrollController.position.maxScrollExtent);
+            });
+        _integratedLogController.addListener(() {
+                // Scroll to the bottom whenever new text is added
+                _integratedLogAreaScrollController.jumpTo(_integratedLogAreaScrollController.position.maxScrollExtent);
+            });
+        _controller = ProjectTabController(_popupLogController);
         _loadPreferencesFuture = _controller.loadPreferences();
         setState(() {});
     }
@@ -65,7 +71,7 @@ class _ProjectTabState extends State<ProjectTab> {
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                                 const SizedBox(height: 20),
-                                                Text("Run Serverpod Commands", style: Theme.of(context).textTheme.headlineSmall),
+                                                Text("Serverpod Commands", style: Theme.of(context).textTheme.headlineSmall),
                                                 Container(
                                                     margin: const EdgeInsets.symmetric(vertical: 4.0),
                                                     padding: const EdgeInsets.all(8.0),
@@ -87,7 +93,7 @@ class _ProjectTabState extends State<ProjectTab> {
                                                         ],
                                                     ),
                                                 ),
-                                                Text("Run Flutter Commands", style: Theme.of(context).textTheme.headlineSmall),
+                                                Text("Flutter Commands", style: Theme.of(context).textTheme.headlineSmall),
                                                 Container(
                                                     margin: const EdgeInsets.symmetric(vertical: 4.0),
                                                     padding: const EdgeInsets.all(8.0),
@@ -115,7 +121,7 @@ class _ProjectTabState extends State<ProjectTab> {
                                 _buildLogOutputArea(),
                                 IconButton(
                                     icon: const Icon(Icons.open_in_new),
-                                    onPressed: _showLogDialog,
+                                    onPressed: _showLogAreaPopup,
                                 ),
                             ],
                         ),
@@ -128,31 +134,35 @@ class _ProjectTabState extends State<ProjectTab> {
     /// Build the project folder text field and folder selector button
     ///
     SizedBox _buildProjectFolderSelector() {
-        double? totalWidth = 900;
         return SizedBox(
-            width: totalWidth,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    SizedBox(
-                        width: totalWidth - 100,
+            width: 1200,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                    Flexible(
+                        flex: 3,
                         child: TextField(
-                            controller: TextEditingController(text: _controller.projectFolderPath), // Set initial text
+                            controller: TextEditingController(text: _controller.projectFolderPath),
                             decoration: const InputDecoration(
                                 labelText: 'Select Top Level Project folder',
                                 border: OutlineInputBorder(),
                             ),
                             onChanged: (value) {
-                                // Update the state with the entered text
                                 _controller.updateProjectFolder(value);
                             },
                         ),
                     ),
                     const SizedBox(width: 10),
-                    DefaultButton(
-                        onPressed: () => _controller.handleProjectFolderSelector(context, setState),
-                        text: '...',
-                        isLoading: _isLoading,
+                    Flexible(
+                        flex: 1,  // Adjust the flex to make sure the button gets enough space
+                        child: DefaultButton(
+                            onPressed: () => _controller.handleProjectFolderSelector(context, setState),
+                            text: '...',
+                            isLoading: _isLoading,
+                        ),
                     ),
-                ]),
+                ],
+            ),
         );
     }
 
@@ -198,7 +208,7 @@ class _ProjectTabState extends State<ProjectTab> {
     CommandRow _buildServerpodGenerateRow() {
         return CommandRow(
             context: context,
-            label: "Generate model (model db classes) and end point code.  Note: Run 'create upgrade script' for any DB changes (below)",
+            label: "Generate model (model db classes) and end point code.\nNote: Run 'serverpod create-migration' (below) for any DB changes",
             commandText: serverpodGenerateTitle,
             onPlayPressed: () async {
                 _setLoading(true);
@@ -221,7 +231,6 @@ class _ProjectTabState extends State<ProjectTab> {
             commandText: CommandRunner.serverpodCreateMigrationCommand,
             onPlayPressed: () async {
                 _setLoading(true);
-
                 await _controller.commandRunner.serverpodCreateMigration();
                 _setLoading(false);
             },
@@ -293,8 +302,8 @@ class _ProjectTabState extends State<ProjectTab> {
     CommandRow _buildCreateRepairMigrationRow() {
         return CommandRow(
             context: context,
-            label:
-            "Create a repair script of the db schema using the model yaml.\nThis will need to be applied on the next server run, or by using the --apply-repair-migration here",
+            label: "Create a repair script of the db schema using the model yaml.\n"
+            "This will need to be applied on the next server run, or by using the --apply-repair-migration here",
             commandText: serverpodCreateRepairMigrationTitle,
             onPlayPressed: () async {
                 _setLoading(true);
@@ -377,7 +386,7 @@ class _ProjectTabState extends State<ProjectTab> {
                 DefaultButton(
                     onPressed: () {
                         setState(() {
-                                logController.text = ''; // Clear the text controller
+                                _popupLogController.text = ''; // Clear the text controller
                             });
                     },
                     text: 'Clear log output',
@@ -404,10 +413,10 @@ class _ProjectTabState extends State<ProjectTab> {
                             maxHeight: 500.0,
                         ),
                         child: ListView(
-                          //  controller: _scrollController,
+                            controller: _integratedLogAreaScrollController,
                             children: [
                                 TextField(
-                                    controller: logController,
+                                    controller: _integratedLogController,
                                     readOnly: true,
                                     maxLines: null,
                                     decoration: const InputDecoration(
@@ -426,7 +435,7 @@ class _ProjectTabState extends State<ProjectTab> {
     ///
     /// Shows the log area popup
     ///
-    void _showLogDialog() {
+    void _showLogAreaPopup() {
         showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -455,10 +464,10 @@ class _ProjectTabState extends State<ProjectTab> {
                                                 border: Border.all(color: Colors.grey),
                                             ),
                                             child: ListView(
-                                                controller: _scrollController,
+                                                controller: _popupLogAreaScrollController,
                                                 children: [
                                                     TextField(
-                                                        controller: logController,
+                                                        controller: _popupLogController,
                                                         readOnly: true,
                                                         maxLines: null,
                                                         decoration: const InputDecoration(
@@ -481,8 +490,10 @@ class _ProjectTabState extends State<ProjectTab> {
 
     @override
     void dispose() {
-        logController.dispose();
-        _scrollController.dispose();
+        _popupLogController.dispose();
+        _popupLogAreaScrollController.dispose();
+        _integratedLogController.dispose();
+        _integratedLogAreaScrollController.dispose();
         super.dispose();
     }
 
@@ -504,8 +515,8 @@ class _ProjectTabState extends State<ProjectTab> {
 
     void _setLoading(bool isLoading) {
         if (isLoading) {
-            logController.text = '';
-            _showLogDialog();
+            _popupLogController.text = '';
+            _showLogAreaPopup();
         }
         setState(() {
                 _isLoading = isLoading;

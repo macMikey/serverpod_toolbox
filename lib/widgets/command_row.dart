@@ -4,7 +4,7 @@ import 'package:serverpod_toolbox/widgets/info_popup_box.dart';
 import 'copy_to_clipboard_button.dart';
 
 ///
-/// A generic 'Command Row' widget
+/// A 'Command Row' widget to display the command description, play button, command to run, etc.
 ///
 class CommandRow extends StatelessWidget {
     final BuildContext context;
@@ -46,7 +46,6 @@ class CommandRow extends StatelessWidget {
                 Row(
                     children: [
                         _buildLabel(),
-                        const Spacer(),
                         _buildPlayButton(onPlayPressed),
                         const SizedBox(width: 5.0),
                         _buildCommandTextBox(commandText, onPlayPressed),
@@ -62,7 +61,7 @@ class CommandRow extends StatelessWidget {
                             const SizedBox(width: 10.0),
                             _buildPlayButton(onSecondaryPlayPressed),
                             const SizedBox(width: 5.0),
-                            _buildCommandTextBox(secondaryCommandText!, onPlayPressed),
+                            _buildCommandTextBox(secondaryCommandText!, onSecondaryPlayPressed),
                             const SizedBox(width: 10.0),
                             CopyToClipboardButton(textToCopy: commandText),
                             const SizedBox(width: 40.0),
@@ -79,9 +78,12 @@ class CommandRow extends StatelessWidget {
     /// The label is displayed with ellipsis overflow if it is too long.
     ///
     Widget _buildLabel() {
-        return Text(
-            label,
-            maxLines: 2,
+        return Expanded(
+            child: Text(
+                label,
+                maxLines: 2,  // Adjust maxLines as needed
+                overflow: TextOverflow.ellipsis,
+            ),
         );
     }
 
@@ -107,9 +109,9 @@ class CommandRow extends StatelessWidget {
                 backgroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4.0),
-                    side: BorderSide(
-                        color: Colors.white,  // Set the color of the border
-                        width: 0.5,          // Set the width of the border
+                    side: const BorderSide(
+                        color: Colors.white,
+                        width: 0.5,
                     ),
                 ),
             ),

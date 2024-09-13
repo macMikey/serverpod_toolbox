@@ -30,7 +30,7 @@ class ProjectTabController {
             projectFolderPath = "";
         } else {
             projectFolderPath = value;
-            commandRunner = CommandRunner(projectFolderPath, logController, _addToLog);
+            commandRunner = CommandRunner(projectFolderPath,  _addToLog);
             commandRunner.populateFolders();
         }
     }
@@ -79,18 +79,13 @@ class ProjectTabController {
     ///
     Future<String?> _getDirectoryPathWindows() {
         final Completer<String?> completer = Completer<String?>();
-
-        // Use DirectoryPicker to open the directory picker dialog
         final directoryPicker = DirectoryPicker()..title = 'Select a directory';
 
-        // Show the directory picker dialog
         Future.microtask(() {
             final selectedDirectory = directoryPicker.getDirectory();
             if (selectedDirectory != null) {
-                // Complete the Future with the selected directory path
                 completer.complete(selectedDirectory.path);
             } else {
-                // Complete the Future with null if no directory was selected
                 completer.complete(null);
             }
         });
@@ -113,14 +108,11 @@ class ProjectTabController {
         } else {
             message = rawOutput.toString();
         }
-
         logController.text += '$message\n';
-
     }
 
-
     ///
-    /// Update the project with the entered text
+    /// Update and save the top level project folder
     ///
     void updateProjectFolder(String value) {
         projectFolderPath = value;

@@ -7,8 +7,9 @@ import 'package:flutter/cupertino.dart';
 ///
 class CommandRunner {
     String projectDir;
-    TextEditingController logController;
+    //TextEditingController logController;
     Function logAppender; // set to the addToLog() function from the project tab
+    String _currentLogText = ''; // used to parse the log when completed
 
     // List of project folders
     List<String> serverpodFolders = [];
@@ -28,16 +29,16 @@ class CommandRunner {
     static const String serverpodCreateRepairMigrationCommand = 'serverpod create-repair-migration';
     static const String serverpodApplyRepairMigrationCommand = 'dart run bin/main.dart --apply-repair-migration';
 
-    CommandRunner(this.projectDir, this.logController, this.logAppender);
+    CommandRunner(this.projectDir, this.logAppender);
 
     ///
     /// Populate the directories
     ///
     Future<void> populateFolders() async {
         // remove all path separators from the end of the project directory
-            while (projectDir.endsWith(Platform.pathSeparator)) {
-                projectDir = projectDir.substring(0, projectDir.length - 1);
-            }
+        while (projectDir.endsWith(Platform.pathSeparator)) {
+            projectDir = projectDir.substring(0, projectDir.length - 1);
+        }
         // get the project name
         final segments = projectDir.split(Platform.pathSeparator);
         String projectName = segments.last;
@@ -123,13 +124,15 @@ class CommandRunner {
         _processLog();
     }
 
-    Future<void> serverpodCreateMigration([String? force]) async {
+    Future<void> serverpodCreateMigration([String force = '']) async {
         await _runCommand("$serverpodCreateMigrationCommand $force", subFolder: _projectFolderServer);
         _processLog();
     }
 
-    Future<void> buildRunner([String? release]) async {
-        await _runCommand("$buildRunnerCommand $release", subFolder: _projectFolderServer);
+    Future<void> buildRunner([String release = '']) async {
+        for (final folder in serverpodFolders) {
+            await _runCommand("$buildRunnerCommand $release", subFolder: folder);
+        }
         _processLog();
     }
 
@@ -149,6 +152,29 @@ class CommandRunner {
     }
 
     void _processLog() {
-        logAppender("**** Finished ******");
+        String analysisText = '';
+
+        final errorPatterns = [
+            RegExp(r'\ERROR\b', caseSensitive: false), // Matches "ERROR" (case-insensitive)
+            RegExp(r'\WARNING\b', caseSensitive: false), // Matches "ERROR" (case-insensitive)
+            RegExp(r'\SEVERE\b', caseSensitive: false), // Matches "ERROR" (case-insensitive)
+            RegExp(r'\bException\b', caseSensitive: false), // Matches "Exception" (case-insensitive)
+            RegExp(r'\bFailed\b', caseSensitive: false), // Matches "Failed" (case-insensitive)
+            RegExp(r'\bFatal\b', caseSensitive: false), // Matches "Fatal" (case-insensitive)
+        ];
+
+        // Check if any of the patterns match the log text
+        for (var pattern in errorPatterns) {
+            if (pattern.hasMatch(_currentLogText)) {
+                analysisText += "${pattern.pattern} found.";
+            }
+        }
+        if (analysisText.isEmpty) {
+            analysisText = "**** Finished ******";
+        } else {
+            analysisText += "Please check output";
+        }
+
+        logAppender(analysisText);
     }
 }
