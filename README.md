@@ -1,6 +1,6 @@
 # Serverpod Toolbox
 
-The Serverpod Toolbox is designed to optimize your Serverpod development workflow by automating common tasks, ensuring safe upgrades, 
+The Serverpod Toolbox is designed to optimise your Serverpod development workflow by automating common tasks, ensuring safe upgrades, 
 and providing easy access to essential commands.  Simplify the process of building, running, and maintaining your Serverpod projects.
 
 ## Key Features
