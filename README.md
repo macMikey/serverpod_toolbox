@@ -17,10 +17,10 @@ and providing easy access to essential commands.  Simplify the process of buildi
 
 **Supported Project Structure:**
 Your project should contain the standard serverpod folder structure:
-/project_name_flutter/
-/project_name_server/
-/project_name_client/
-/project_name_shared/ (optional)
+/project_name_flutter/  
+/project_name_server/  
+/project_name_client/  
+/project_name_shared/ (optional)  
 
 Where 'project_name' is the name of your serverpod project
 
