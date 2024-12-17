@@ -26,7 +26,7 @@ and providing easy access to essential commands.  Simplify the process of buildi
     
     Where 'project_name' is the name of your serverpod project
 
-3. Now just select the action you want to perform on you project by clicking the green 'play' icon next to the command.
+3. Now just select the action you want to perform on your project by clicking the green 'play' icon next to the command.
    Not sure what the command does?  Click the info button next to it!
 
     ![Screenshot of Serverpod Toolbox](readme/screenshot.png)
