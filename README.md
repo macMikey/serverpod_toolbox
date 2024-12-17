@@ -13,6 +13,8 @@ and providing easy access to essential commands.  Simplify the process of buildi
 ## Installation and Setup
 
 1. **Install the application:**  
+   [serverpod_toolbox_installer.exe](https://github.com/KomosSolutions/serverpod_toolbox/blob/master/installer/Output/serverpod_toolbox_installer.exe)
+
 2. **Set Project Folder:** Set the project to the top level serverpod folder.
 
 **Supported Project Structure:**
@@ -24,9 +26,9 @@ Your project should contain the standard serverpod folder structure:
 
 Where 'project_name' is the name of your serverpod project
 
+![Screenshot of Serverpod Toolbox](readme/screenshot.png)
+
 ## Contributing
 
 We welcome contributions to improve the toolbox! 
-
-
 
