@@ -73,7 +73,7 @@ class CommandRow extends StatelessWidget {
     }
 
     ///
-    /// Build the label widget for the command row.
+    /// Builds the label widget for the command row.
     ///
     /// The label is displayed with ellipsis overflow if it is too long.
     ///
@@ -88,7 +88,7 @@ class CommandRow extends StatelessWidget {
     }
 
     ///
-    /// Build the command text box/button widget.
+    /// Builds the command text box/button widget.
     ///
     /// This widget displays the command text inside a styled container with a black background
     /// and white terminal font.  Clicking the box will run the command.
@@ -134,7 +134,7 @@ class CommandRow extends StatelessWidget {
     }
 
     ///
-    /// Build the play button widget.
+    /// Builds the play button widget.
     ///
     /// This button is displayed as a green play arrow icon. When pressed, it triggers the [onPlayPressed]
     /// function and prevents multiple presses if [isLoading] is true.
@@ -157,7 +157,7 @@ class CommandRow extends StatelessWidget {
 
 
     ///
-    /// Build the info icon widget.
+    /// Builds the info icon widget.
     ///
     /// This icon is displayed as an info outline icon. When pressed, it triggers the [showInfoPopup]
     /// function with the [commandText] and [infoHtmlBody].

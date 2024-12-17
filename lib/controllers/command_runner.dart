@@ -1,15 +1,13 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-
 ///
 /// Runs a command using cmd.exe
 ///
 class CommandRunner {
     String projectDir;
-    //TextEditingController logController;
+
     Function logAppender; // set to the addToLog() function from the project tab
-    String _currentLogText = ''; // used to parse the log when completed
+    final String _currentLogText = ''; // used to parse the log when completed
 
     // List of project folders
     List<String> serverpodFolders = [];
@@ -32,7 +30,7 @@ class CommandRunner {
     CommandRunner(this.projectDir, this.logAppender);
 
     ///
-    /// Populate the directories
+    /// Populates the directories
     ///
     Future<void> populateFolders() async {
         // remove all path separators from the end of the project directory
@@ -57,7 +55,7 @@ class CommandRunner {
         serverpodFolders = [_projectFolderServer, _projectFolderFlutter, _projectFolderClient];
 
         // Add the  'project_shared' folder if it exists
-        String sharedDir = "${projectDir}${Platform.pathSeparator}${projectName}_shared";
+        String sharedDir = "$projectDir${Platform.pathSeparator}${projectName}_shared";
         bool sharedFolderExists = await Directory(sharedDir).exists();
         if (sharedFolderExists) {
             _projectFolderShared = "${projectName}_shared";
@@ -66,7 +64,7 @@ class CommandRunner {
     }
 
     ///
-    /// Run an OS command
+    /// Runs an OS command
     ///
     Future<void> _runCommand(String command, {String subFolder = ""}) async {
         try {

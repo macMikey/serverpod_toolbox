@@ -12,11 +12,11 @@ and providing easy access to essential commands.  Simplify the process of buildi
 
 ## Installation and Setup
 
-1. **Install the application:** 
+1. **Install the application:**  
 2. **Set Project Folder:** Set the project to the top level serverpod folder.
 
 **Supported Project Structure:**
-Your project should contain the standard serverpod folder structure:
+Your project should contain the standard serverpod folder structure:  
 /project_name_flutter/  
 /project_name_server/  
 /project_name_client/  

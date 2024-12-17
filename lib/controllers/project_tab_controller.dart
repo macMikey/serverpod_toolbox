@@ -20,7 +20,7 @@ class ProjectTabController {
     ProjectTabController(this.logController);
 
     ///
-    /// Load the stored preferences
+    /// Loads the stored preferences
     ///
     Future<void> loadPreferences() async {
         preferences = Preferences();
@@ -36,7 +36,7 @@ class ProjectTabController {
     }
 
     ///
-    /// Handle the project folder selection
+    /// Handles the project folder selection
     ///
     Future<void> handleProjectFolderSelector(BuildContext context, Function setStateCallback) async {
         final selectedDirectory = await _getDirectoryPicker(context);
@@ -93,7 +93,7 @@ class ProjectTabController {
     }
 
     ///
-    /// Add text to the log area
+    /// Adds text to the log area
     ///
     void _addToLog(dynamic rawOutput) {
         String message = "";
@@ -108,11 +108,15 @@ class ProjectTabController {
         } else {
             message = rawOutput.toString();
         }
+
+        // Append the message to the log
         logController.text += '$message\n';
+
     }
 
+
     ///
-    /// Update and save the top level project folder
+    /// Updates and save the top level project folder
     ///
     void updateProjectFolder(String value) {
         projectFolderPath = value;

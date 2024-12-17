@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for clipboard functionality
+import 'package:flutter/services.dart';
 
 class CopyToClipboardButton extends StatelessWidget {
     final String textToCopy;

@@ -24,8 +24,6 @@ class _ProjectTabState extends State<ProjectTab> {
     late ProjectTabController _controller;
     final TextEditingController _popupLogController = TextEditingController();
     final _popupLogAreaScrollController = ScrollController();
-    final TextEditingController _integratedLogController = TextEditingController();
-    final _integratedLogAreaScrollController = ScrollController();
     bool _isLoading = false;
     late Future<void> _loadPreferencesFuture;
 
@@ -35,12 +33,11 @@ class _ProjectTabState extends State<ProjectTab> {
 
         _popupLogController.addListener(() {
                 // Scroll to the bottom whenever new text is added
-                _popupLogAreaScrollController.jumpTo(_popupLogAreaScrollController.position.maxScrollExtent);
+                if (_popupLogAreaScrollController.hasClients) {
+                    _popupLogAreaScrollController.jumpTo(_popupLogAreaScrollController.position.maxScrollExtent);
+                }
             });
-        _integratedLogController.addListener(() {
-                // Scroll to the bottom whenever new text is added
-                _integratedLogAreaScrollController.jumpTo(_integratedLogAreaScrollController.position.maxScrollExtent);
-            });
+
         _controller = ProjectTabController(_popupLogController);
         _loadPreferencesFuture = _controller.loadPreferences();
         setState(() {});
@@ -117,12 +114,8 @@ class _ProjectTabState extends State<ProjectTab> {
                                         ),
                                     ),
                                 ),
-                                _buildClearLogButton(),
-                                _buildLogOutputArea(),
-                                IconButton(
-                                    icon: const Icon(Icons.open_in_new),
-                                    onPressed: _showLogAreaPopup,
-                                ),
+                                //   _buildClearLogButton(),
+                                _buildLogButton(),
                             ],
                         ),
                     );
@@ -131,7 +124,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the project folder text field and folder selector button
+    /// Builds the project folder text field and folder selector button
     ///
     SizedBox _buildProjectFolderSelector() {
         return SizedBox(
@@ -167,7 +160,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the flutter upgrade button
+    /// Builds the flutter upgrade button
     ///
     CommandRow _buildFlutterUpgradeRow() {
         return CommandRow(
@@ -185,7 +178,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the 'upgrade CLI version' row
+    /// Builds the 'upgrade CLI version' row
     ///
     CommandRow _buildUpgradeCLIRow() {
         return CommandRow(
@@ -203,7 +196,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the 'serverpod generate' row
+    /// Builds the 'serverpod generate' row
     ///
     CommandRow _buildServerpodGenerateRow() {
         return CommandRow(
@@ -221,7 +214,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the 'create migration' row, with a secondary --force create migration button
+    /// Builds the 'create migration' row, with a secondary --force create migration button
     ///
     CommandRow _buildServerpodCreateMigrationRow() {
         return CommandRow(
@@ -273,7 +266,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the 'dart run build_runner build --release' button
+    /// Builds the 'dart run build_runner build --release' button
     ///
     CommandRow _buildServerpodBuildRunnerRow() {
         return CommandRow(
@@ -297,7 +290,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build the repair migration row
+    /// Builds the repair migration row
     ///
     CommandRow _buildCreateRepairMigrationRow() {
         return CommandRow(
@@ -322,7 +315,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build clean button
+    /// Builds clean button
     ///
     /// Cleans the library files in all project folders.
     ///
@@ -342,7 +335,7 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Build 'flutter get pub'
+    /// Builds 'flutter get pub'
     ///
     CommandRow _buildFlutterGetPubRow() {
         return CommandRow(
@@ -378,57 +371,24 @@ class _ProjectTabState extends State<ProjectTab> {
     }
 
     ///
-    /// Clear log button
+    ///  log button
     ///
-    Row _buildClearLogButton() {
+    Row _buildLogButton() {
         return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
                 DefaultButton(
                     onPressed: () {
-                        setState(() {
-                                _popupLogController.text = ''; // Clear the text controller
-                            });
+                        _showLogAreaPopup();
                     },
-                    text: 'Clear log output',
-                    isLoading: _isLoading,
+                    text: 'Log output',
+                    isLoading: false,
                 ),
-            ],
-        );
-    }
+                const SizedBox(width: 10),
+                if (_isLoading)
+                const CircularProgressIndicator(),  // Show spinner when loading
 
-    ///
-    /// Build the log output area
-    ///
-    Widget _buildLogOutputArea() {
-        return SizedBox(
-            height: 150,
-            child: NotificationListener<ScrollNotification>(
-                child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                    ),
-                    child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                            maxHeight: 500.0,
-                        ),
-                        child: ListView(
-                            controller: _integratedLogAreaScrollController,
-                            children: [
-                                TextField(
-                                    controller: _integratedLogController,
-                                    readOnly: true,
-                                    maxLines: null,
-                                    decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        labelText: 'Log Output',
-                                    ),
-                                ),
-                            ],
-                        ),
-                    ),
-                ),
-            ),
+            ],
         );
     }
 
@@ -448,6 +408,13 @@ class _ProjectTabState extends State<ProjectTab> {
                                 AppBar(
                                     title: const Text('Log Output'),
                                     actions: [
+                                        IconButton(
+                                            icon: const Icon(Icons.delete),
+                                            tooltip: 'Clear the log output',
+                                            onPressed: () {
+                                                _popupLogController.text = ''; // Clear the text controller
+                                            },
+                                        ),
                                         IconButton(
                                             icon: const Icon(Icons.close),
                                             onPressed: () {
@@ -492,8 +459,6 @@ class _ProjectTabState extends State<ProjectTab> {
     void dispose() {
         _popupLogController.dispose();
         _popupLogAreaScrollController.dispose();
-        _integratedLogController.dispose();
-        _integratedLogAreaScrollController.dispose();
         super.dispose();
     }
 

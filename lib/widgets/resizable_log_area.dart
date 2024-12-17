@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ResizableLogOutput extends StatelessWidget {
     final TextEditingController logController;
 
-    ResizableLogOutput({super.key, required this.logController});
+    const ResizableLogOutput({super.key, required this.logController});
 
     @override
     Widget build(BuildContext context) {

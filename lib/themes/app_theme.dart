@@ -57,7 +57,7 @@ class AppTheme {
             seedColor: themeColour,
             brightness: Brightness.light,
         ).copyWith(
-            background: Colors.white,
+            surface: Colors.white,
         );
         appBarTheme = const AppBarTheme(
             backgroundColor: Colors.white,
@@ -97,7 +97,7 @@ class AppTheme {
 
 
     ///
-    /// Create a ThemeData object based on the current theme settings
+    /// Creates a ThemeData object based on the current theme settings
     ///
     ThemeData get themeData {
         return ThemeData(
@@ -111,6 +111,7 @@ class AppTheme {
     }
 
 
+    ///
     /// Style for a standard button
     ///
     static ButtonStyle standardButtonStyle({bool greyOut = false}) {
